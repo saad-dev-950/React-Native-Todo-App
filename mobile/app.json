@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Todo Assignment",
+    "slug": "todo-assignment",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0f172a"
+    },
+    "android": {
+      "package": "com.example.todoassignment"
+    },
+    "ios": {
+      "bundleIdentifier": "com.example.todoassignment"
+    }
+  }
+}
