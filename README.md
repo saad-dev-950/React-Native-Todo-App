@@ -119,8 +119,8 @@ Todo Mobile App/
 
 3. Verify your `.env` configuration file in `backend/.env`:
    ```env
-   MONGODB_URI=mongodb://saaddevpk_db_user:tOSjMJ1tAXCXhPYO@ac-egswxen-shard-00-00.jnphx2b.mongodb.net:27017,ac-egswxen-shard-00-01.jnphx2b.mongodb.net:27017,ac-egswxen-shard-00-02.jnphx2b.mongodb.net:27017/todo_assignment?ssl=true&replicaSet=atlas-mrrnov-shard-0&authSource=admin&appName=todomobileapp
-   JWT_SECRET=my_super_secret_jwt_key_123
+   MONGODB_URI=mongodb+srv://YOUR_DB_USER:YOUR_DB_PASSWORD@cluster0.example.mongodb.net/todo_assignment?retryWrites=true&w=majority
+   JWT_SECRET=your_super_secret_jwt_key_here
    PORT=5000
    ```
 
