@@ -8,21 +8,27 @@ const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#090d16' },
+        headerTintColor: '#ffffff',
+        headerTitleStyle: { fontWeight: '800' },
+      }}
+    >
       <Stack.Screen
         name="TodoHome"
         component={TodoScreen}
-        options={{ title: 'My Todos' }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="AddTodo"
         component={AddTodoScreen}
-        options={{ title: 'Add Task' }}
+        options={{ title: 'Add Task 🚀', headerStyle: { backgroundColor: '#090d16' }, headerTintColor: '#fff' }}
       />
       <Stack.Screen
         name="EditTodo"
         component={EditTodoScreen}
-        options={{ title: 'Edit Task' }}
+        options={{ title: 'Edit Task ✏️', headerStyle: { backgroundColor: '#090d16' }, headerTintColor: '#fff' }}
       />
     </Stack.Navigator>
   );

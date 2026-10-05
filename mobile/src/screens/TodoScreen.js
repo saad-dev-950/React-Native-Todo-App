@@ -1,8 +1,7 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Animated,
   FlatList,
   Pressable,
   RefreshControl,
@@ -18,6 +17,7 @@ import TodoItem from '../components/TodoItem';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
+import { requestNotificationPermissions } from '../services/notificationService';
 import {
   deleteTodo,
   getTodos,
@@ -30,7 +30,7 @@ function apiMessage(error) {
 
 export default function TodoScreen({ navigation }) {
   const { user, logout } = useAuth();
-  const { isDark, toggleTheme, theme } = useTheme();
+  const { isDark, toggleTheme, theme, changeAccent, activeAccent, accentsList } = useTheme();
   const { showToast } = useToast();
 
   const [todos, setTodos] = useState([]);
@@ -40,7 +40,12 @@ export default function TodoScreen({ navigation }) {
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('all'); // 'all', 'pending', 'completed', 'high'
+  const [selectedFilter, setSelectedFilter] = useState('all');
+
+  // Request notifications on mount
+  useEffect(() => {
+    requestNotificationPermissions();
+  }, []);
 
   const loadTodos = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -106,12 +111,10 @@ export default function TodoScreen({ navigation }) {
   // Filter & Search Logic
   const filteredTodos = useMemo(() => {
     return todos.filter((todo) => {
-      // Filter by category
       if (selectedFilter === 'pending' && todo.completed) return false;
       if (selectedFilter === 'completed' && !todo.completed) return false;
       if (selectedFilter === 'high' && todo.priority !== 'high') return false;
 
-      // Filter by search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchTitle = todo.title.toLowerCase().includes(q);
@@ -131,33 +134,60 @@ export default function TodoScreen({ navigation }) {
     <View style={[styles.container, { backgroundColor: theme.bg }]}>
       <StatusBar barStyle="light-content" backgroundColor="#090d16" />
 
-      {/* Modern Dashboard Header */}
+      {/* Crazy Cyberpunk Dashboard Header */}
       <View style={[styles.header, { backgroundColor: theme.headerBg }]}>
-        <View style={styles.userSection}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{user?.name?.charAt(0)?.toUpperCase() || '👤'}</Text>
+        <View style={styles.topBrandRow}>
+          <View style={styles.brandBadge}>
+            <Text style={styles.brandBadgeText}>⚡</Text>
           </View>
-          <View style={styles.userInfo}>
-            <Text style={styles.greeting}>Welcome, {user?.name || 'Student'} 👋</Text>
-            <Text style={styles.statsText}>
-              {pendingCount} Pending • {completedCount} Done
+          <View style={styles.brandTextContainer}>
+            <Text style={[styles.brandTitle, { color: activeAccent.primaryGlow }]}>TASKIFY CYBER</Text>
+            <Text style={styles.brandSubtitle}>Realtime Task Management</Text>
+          </View>
+          <View style={styles.headerRightIcons}>
+            <Pressable onPress={toggleTheme} style={styles.iconBtn}>
+              <Text style={styles.iconText}>{isDark ? '☀️' : '🌙'}</Text>
+            </Pressable>
+            <Pressable onPress={logout} style={styles.logoutBtn}>
+              <Text style={styles.logoutBtnText}>Logout ➔</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* User Info & Stats Bar */}
+        <View style={styles.userBannerRow}>
+          <View style={styles.userGreetingSection}>
+            <Text style={styles.greetingText}>Welcome back, <Text style={{ color: activeAccent.primaryGlow, fontWeight: '900' }}>{user?.name || 'User'}</Text> 👋</Text>
+          </View>
+          <View style={styles.statsPill}>
+            <Text style={styles.statsPillText}>
+              🔥 {pendingCount} Pending • ✅ {completedCount} Done
             </Text>
           </View>
         </View>
 
-        <View style={styles.headerIcons}>
-          <Pressable onPress={toggleTheme} style={styles.iconBtn}>
-            <Text style={styles.iconText}>{isDark ? '☀️' : '🌙'}</Text>
-          </Pressable>
-          <Pressable onPress={logout} style={styles.professionalLogoutBtn}>
-            <Text style={styles.logoutBtnText}>Logout ➔</Text>
-          </Pressable>
+        {/* Cyberpunk Accent Theme Picker Bar */}
+        <View style={styles.accentPickerRow}>
+          <Text style={styles.accentPickerLabel}>ACCENT THEME:</Text>
+          {accentsList.map((acc) => (
+            <Pressable
+              key={acc.key}
+              onPress={() => changeAccent(acc.key)}
+              style={[
+                styles.accentBtn,
+                { backgroundColor: acc.primary },
+                activeAccent.key === acc.key && styles.accentBtnActive,
+              ]}
+            >
+              {activeAccent.key === acc.key ? <Text style={styles.accentCheck}>✓</Text> : null}
+            </Pressable>
+          ))}
         </View>
       </View>
 
       {/* Search Bar */}
       <View style={styles.searchSection}>
-        <View style={[styles.searchBar, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+        <View style={[styles.searchBar, { backgroundColor: theme.card, borderColor: activeAccent.primary }]}>
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
@@ -188,7 +218,7 @@ export default function TodoScreen({ navigation }) {
             style={[
               styles.filterPill,
               { backgroundColor: theme.card, borderColor: theme.cardBorder },
-              selectedFilter === f.key && styles.filterPillActive,
+              selectedFilter === f.key && { backgroundColor: activeAccent.primary, borderColor: activeAccent.primaryGlow },
             ]}
           >
             <Text
@@ -208,7 +238,7 @@ export default function TodoScreen({ navigation }) {
       <View style={styles.body}>
         {loading ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color={theme.primary} />
+            <ActivityIndicator size="large" color={activeAccent.primaryGlow} />
             <Text style={[styles.muted, { color: theme.textSecondary }]}>Loading tasks...</Text>
           </View>
         ) : error ? (
@@ -240,7 +270,7 @@ export default function TodoScreen({ navigation }) {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={() => loadTodos(true)}
-                tintColor={theme.primary}
+                tintColor={activeAccent.primaryGlow}
               />
             }
             contentContainerStyle={styles.list}
@@ -251,7 +281,7 @@ export default function TodoScreen({ navigation }) {
       {/* Floating Action Button (FAB) */}
       <Pressable
         onPress={() => navigation.navigate('AddTodo')}
-        style={styles.fab}
+        style={[styles.fab, { backgroundColor: activeAccent.primary, borderColor: activeAccent.primaryGlow }]}
       >
         <Text style={styles.fabIcon}>+</Text>
       </Pressable>
@@ -264,78 +294,136 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 22,
-    paddingTop: 16,
-    paddingBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 48,
+    paddingBottom: 16,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
+    borderBottomWidth: 1.5,
+    borderBottomColor: '#1e293b',
   },
-  userSection: {
+  topBrandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    marginBottom: 14,
   },
-  avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 16,
-    backgroundColor: '#6366f1',
+  brandBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: '#1e1b4b',
+    borderWidth: 1.5,
+    borderColor: '#6366f1',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 14,
+    marginRight: 12,
   },
-  avatarText: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: '900',
+  brandBadgeText: {
+    fontSize: 22,
   },
-  userInfo: {
+  brandTextContainer: {
     flex: 1,
   },
-  greeting: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: '800',
+  brandTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 1,
   },
-  statsText: {
-    color: '#a5b4fc',
-    fontSize: 13,
-    marginTop: 2,
+  brandSubtitle: {
+    color: '#64748b',
+    fontSize: 11.5,
     fontWeight: '600',
   },
-  headerIcons: {
+  headerRightIcons: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
   iconBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 13,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     backgroundColor: '#1e293b',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  professionalLogoutBtn: {
+  iconText: {
+    fontSize: 16,
+  },
+  logoutBtn: {
     backgroundColor: '#450a0a',
     borderColor: '#991b1b',
     borderWidth: 1.2,
     borderRadius: 12,
-    paddingHorizontal: 13,
-    paddingVertical: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
   },
   logoutBtnText: {
     color: '#f87171',
     fontWeight: '800',
-    fontSize: 12.5,
-    letterSpacing: 0.3,
+    fontSize: 12,
   },
-  iconText: {
-    fontSize: 18,
+  userBannerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+    backgroundColor: '#0f172a',
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#1e293b',
+  },
+  userGreetingSection: {
+    flex: 1,
+  },
+  greetingText: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  statsPill: {
+    backgroundColor: '#1e1b4b',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#3730a3',
+  },
+  statsPillText: {
+    color: '#a5b4fc',
+    fontSize: 11.5,
+    fontWeight: '800',
+  },
+  accentPickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 2,
+  },
+  accentPickerLabel: {
+    color: '#64748b',
+    fontSize: 10.5,
+    fontWeight: '900',
+    letterSpacing: 1,
+    marginRight: 4,
+  },
+  accentBtn: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  accentBtnActive: {
+    borderWidth: 2,
+    borderColor: '#ffffff',
+    transform: [{ scale: 1.15 }],
+  },
+  accentCheck: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '900',
   },
   searchSection: {
     paddingHorizontal: 20,
@@ -344,7 +432,7 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1.5,
+    borderWidth: 1.8,
     borderRadius: 16,
     paddingHorizontal: 14,
     height: 48,
@@ -356,7 +444,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   clearIcon: {
     fontSize: 14,
@@ -375,16 +463,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1.5,
   },
-  filterPillActive: {
-    backgroundColor: '#6366f1',
-    borderColor: '#818cf8',
-  },
   filterPillText: {
     fontSize: 12.5,
     fontWeight: '700',
   },
   filterPillTextActive: {
     color: '#ffffff',
+    fontWeight: '800',
   },
   body: {
     flex: 1,
@@ -426,16 +511,14 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 20,
-    backgroundColor: '#6366f1',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#6366f1',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
     shadowRadius: 14,
     elevation: 8,
     borderWidth: 1.5,
-    borderColor: '#818cf8',
   },
   fabIcon: {
     color: '#ffffff',

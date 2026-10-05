@@ -5,6 +5,7 @@ import CustomInput from '../components/CustomInput';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
 import { createTodo } from '../services/todoService';
+import { scheduleTaskNotification } from '../services/notificationService';
 
 function apiMessage(error) {
   return error?.response?.data?.message || 'Unable to connect to the server.';
@@ -37,7 +38,9 @@ export default function AddTodoScreen({ navigation }) {
         priority,
         dueDate: dueDate.trim(),
       });
-      showToast('Task created successfully! 🎉', 'success');
+      // Trigger notification reminder
+      scheduleTaskNotification(title.trim(), dueDate.trim());
+      showToast('Task created & notification set! ⏰🎉', 'success');
       navigation.goBack();
     } catch (requestError) {
       showToast(apiMessage(requestError), 'error');
