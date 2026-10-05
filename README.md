@@ -8,18 +8,20 @@ A high-performance, feature-rich Full-Stack Mobile Application built with **Reac
 
 ### 🎨 **Crazy Animated UI & Aesthetics**
 - **👁️ Crazy Password Eye Toggle:** Custom spring squeeze & pop blinking eye toggle (`🔒` / `🔓`) with glowing active border indicators.
+- **🩵🩷💛💜 Cyberpunk Dynamic Neon Accents:** Switch live between 4 vibrant neon accent themes (`Neon Cyan 🩵`, `Electric Pink 🩷`, `Cyber Yellow 💛`, and `Electric Violet 💜`) with persistent `AsyncStorage` saving.
 - **🌌 Cyberpunk Dark Mesh Theme:** Glowing background orbs that continuously pulse/breathe at 60fps using React Native's Native Driver `Animated` API.
 - **💎 Glassmorphism Cards:** Modern dark glass form cards with glowing indigo borders and soft shadows.
 
 ### 📱 **Main Dashboard & Task Management**
-- **👤 Personalized Header:** Displays `"Welcome, [Name] 👋"`, custom user initials avatar badge, and live task statistics (`X Pending • Y Done`).
+- **⚡ Taskify Cyber Header:** Custom Cyberpunk header featuring `"Welcome back, [Name] 👋"`, live task status chips (`🔥 X Pending • ✅ Y Done`), dark/light theme switch, and quick logout.
+- **⏰ Native Push Notifications & Reminders:** Local phone reminders (`expo-notifications` integration via `notificationService.js`) triggered upon task creation.
 - **🎯 Priority Levels:** Task categorization with `HIGH 🔴`, `MEDIUM 🟡`, and `LOW 🟢` color badges.
 - **📅 Due Dates:** Set deadlines or due dates for tasks (`📅 YYYY-MM-DD` / `Today`).
 - **🔍 Live Search Bar:** Filter tasks instantly by title or description as you type.
 - **🏷️ Category Filter Pills:** Instant tab switching for `All`, `Pending ⏳`, `Completed ✅`, and `High Priority 🔴`.
-- **⚡ Floating Action Button (FAB):** Quick task creation button in the bottom right corner.
+- **⚡ Floating Action Button (FAB):** Quick task creation button with dynamic glow matching your active accent color.
 - **🔔 Animated Toast Notifications:** Slide-down banner snackbars for instant feedback on task creation, completion, editing, and deletion.
-- **🌙 Dark & Light Theme Toggle:** One-tap header switch to toggle between Dark Mode and Light Mode (persisted locally using `AsyncStorage`).
+- **🌙 Dark & Light Theme Toggle:** One-tap header switch to toggle between Dark Mode and Light Mode.
 
 ---
 
