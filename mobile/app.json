@@ -1,19 +1,31 @@
 {
   "expo": {
-    "name": "Todo Assignment",
-    "slug": "todo-assignment",
+    "name": "Taskify Todo",
+    "slug": "taskify-todo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
     "splash": {
-      "backgroundColor": "#0f172a"
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#090d16"
     },
     "android": {
-      "package": "com.example.todoassignment"
+      "package": "com.saaddev.taskifytodo",
+      "usesCleartextTraffic": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#090d16"
+      }
     },
     "ios": {
-      "bundleIdentifier": "com.example.todoassignment"
+      "bundleIdentifier": "com.saaddev.taskifytodo"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f7144780-1ecf-4fee-b527-68ef47a4905e"
+      }
     }
   }
 }

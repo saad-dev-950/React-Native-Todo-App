@@ -9,13 +9,18 @@ const todoRoutes = require('./routes/todoRoutes');
 
 if (!process.env.MONGODB_URI || !process.env.JWT_SECRET) {
   console.error('MONGODB_URI and JWT_SECRET must be defined in .env');
-  process.exit(1);
 }
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Middleware to connect DB on serverless invocations
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Todo API is running.' });
@@ -35,8 +40,12 @@ app.use((error, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Todo API listening on port ${PORT}`);
+if (require.main === module) {
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Todo API listening on port ${PORT}`);
+    });
   });
-});
+}
+
+module.exports = app;
